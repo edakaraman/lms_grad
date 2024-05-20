@@ -73,8 +73,8 @@ export default function Content({ content, onChapterFinish }) {
       >
         <Text style={{ color: "white", fontSize: 18,fontWeight:"bold" }}> Bölümü Tamamla </Text>
       </TouchableOpacity>
-      }
-      
+      }  
+
     </View>
   );
 }

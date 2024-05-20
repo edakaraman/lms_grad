@@ -60,7 +60,7 @@ export default function CourseDetailScreen() {
 
   const stripeEnrollCourse = async () => {
     try {
-      const response = await fetch("http://192.168.1.36:3000/pay", {
+      const response = await fetch("http://192.168.1.39:3000/pay", {
         method: "POST",
         body: JSON.stringify({ courseName, coursePrice }),
         headers: {

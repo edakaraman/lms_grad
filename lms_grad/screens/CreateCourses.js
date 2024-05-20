@@ -6,7 +6,7 @@ import Button from "../components/Button";
 import RadioButton from "../components/RadioButton";
 import VideoPickerForm from "../components/VideoPickerForm";
 import { useUser } from "@clerk/clerk-expo";
-import { createCourse, GetCategory, publishCourse } from "../services";
+import { createCourse, GetCategory, publishAsset, publishCourse } from "../services";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
@@ -16,11 +16,12 @@ const CreateCourses = ({ navigation }) => {
   const [description, setDescription] = useState("");
   const [totalChapters, setTotalChapters] = useState(0);
   const [price, setPrice] = useState("");
-  const [free, setFree] = useState(false); 
-  const [chapterName, setChapterName] = useState("");
-  const [chapterDesc, setChapterDesc] = useState("");
-  const [chapterNo, setChapterNo] = useState("");
+  const [free, setFree] = useState(null); 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [coverPhoto, setCoverPhoto] = useState(null);
+
+  const HYGRAPH_ASSET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE3MTYxMjcwNTgsImF1ZCI6WyJodHRwczovL2FwaS1ldS13ZXN0LTIuaHlncmFwaC5jb20vdjIvY2xza3BxbHQ2M3dwZzAxdXBsbTRuMHQ3MS9tYXN0ZXIiLCJtYW5hZ2VtZW50LW5leHQuZ3JhcGhjbXMuY29tIl0sImlzcyI6Imh0dHBzOi8vbWFuYWdlbWVudC1ldS13ZXN0LTIuaHlncmFwaC5jb20vIiwic3ViIjoiNTg3OGUxZDMtNWJjMy00YzZkLTgwMzMtZDgyMWI2MmI5ZDhkIiwianRpIjoiY2x3ZGxxcGF2ajRobTA4anQ0MDZpYWxobSJ9.f1tncbqNT1xDpQgxtYhOlUAY3liLKUoaYAGVc6xxT7Su-0a6bmB3uKGULbPCcHKxocva8HfGtDnMczGpC1LZvoIQy9FrVftHHI5RublU2ZSOWpHnLGPxN9_QfC6reSSSWBgCCdIiq2sUblunM8DtGDmkTIpo75fYpoizeZGXNywXrg3tGk4vJVoBbSVBePM8Qx7fVF2rc7bYOCyGufgpnVo5-Rv_ZDtj-_0TTk2br4Vf6fKH92oBrKKBOUQOjU2IVyux7FOQQANCDaSmnVyqsbx6-zc1y5izKkC545hg9zMuoqhpTgfVwfJJekEGzDpXBSt4rqUACFVsbz_Xr0utvroQrEJQ97GMk8m-twOxSCeO00PJlDDupT3USDN7pADX5XCs_vLy0_9AMFxmv3ID4XvGggtp2d-a-TeQKtkT-DRg8x4O-ZaaT4w7L7Bg_Y9nh-ibVpFk9gtg5C9mtIt9bFHzgKFrblO24f-Tk-8MB2P1FLrnaJy9EMnU8WCcIDdQh8-notWa5AE4Xj6hcWxCUX269WOLVlp2i2_s4bXg1ClsopdYJ6LgeKzHkmIT2U1ZJcoDAa_WOd6o4_B8K_UqH8p64XiaOlR-LefJDmPbD59b26q2laqpf4BUsjBEbcH8s-TnFHRNqTWOOJq-c5i6ziGNAN6EprV53kX99S-r6iU';
+  const HYGRAPH_URL = "https://api-eu-west-2.hygraph.com/v2/clskpqlt63wpg01uplm4n0t71/master";
 
   const { user } = useUser();
 
@@ -52,29 +53,58 @@ const CreateCourses = ({ navigation }) => {
       });
   }, []); 
 
-  const handleSubmit = () => {
-    const courseData = {
-      name,
-      description,
-      totalChapters: parseInt(totalChapters),
-      price,
-      free,
-      authorEmail: user.primaryEmailAddress.emailAddress,
-      selectedCategory,
-    };
+const handleSubmit = async () => {
+    try {
+      let coverPhotoId = null;
+      if (coverPhoto) {
+        const form = new FormData();
+        form.append('fileUpload', {
+          uri: coverPhoto,
+          name: coverPhoto.split('/').pop(),
+          type: 'image/jpeg',
+        });
   
-    createCourse(courseData)
-      .then((result) => {
-        Alert.alert("Kurs Ekleme Başarılı!", "Kurs Eklendi!");
-        console.log("Kurs eklendi:", result);
-        publishCourse(result.createCourseList.id)
-        .then((publishResult) => {
-          console.log("Kurs yayınlandı:", publishResult);
-        })
-      })
-      .catch((error) => {
-        console.error("Kurs eklenirken bir hata oluştu:", error);
-      });
+        const uploadResponse = await fetch(`${HYGRAPH_URL}/upload`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${HYGRAPH_ASSET_TOKEN}`,
+            'Content-Type': 'multipart/form-data',
+          },
+          body: form,
+        });
+  
+        if (!uploadResponse.ok) {
+          throw new Error(`Upload failed with status ${uploadResponse.status}`);
+        }
+  
+        const responseData = await uploadResponse.json();
+        coverPhotoId = responseData.id;
+  
+        const publishAssetResult = await publishAsset(coverPhotoId);
+        console.log("Asset yayınlandı:", publishAssetResult);
+      }
+  
+      const courseData = {
+        name,
+        description,
+        totalChapters: parseInt(totalChapters),
+        price: parseFloat(price), 
+        free: Boolean(free),
+        authorEmail: user.primaryEmailAddress.emailAddress,
+        selectedCategory, 
+        coverPhoto: coverPhotoId,
+      };
+  
+      const result = await createCourse(courseData);
+      Alert.alert("Kurs Ekleme Başarılı!", "Kurs Eklendi!");
+      console.log("Kurs eklendi:", result);
+  
+      const publishResult = await publishCourse(result.createCourseList.id);
+      console.log("Kurs yayınlandı:", publishResult);
+    } catch (error) {
+      console.error("Kurs eklenirken bir hata oluştu:", error);
+      Alert.alert("Hata", `Kurs eklenirken bir hata oluştu: ${error.message}`);
+    }
   };
   
   const options = [
@@ -85,7 +115,6 @@ const CreateCourses = ({ navigation }) => {
   const [isFocus, setIsFocus] = useState(false);
   const [categories, setCategories] = useState([]);
 
-  const [image, setImage] = useState(null);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -96,6 +125,9 @@ const CreateCourses = ({ navigation }) => {
     });
   
     console.log(result);
+    if(result){
+      Alert.alert("Kapak görseli eklendi!");
+    }
   
     if (
       !result ||
@@ -106,13 +138,13 @@ const CreateCourses = ({ navigation }) => {
       return;
     }
   
-    setImage(result.uri);
+    setCoverPhoto(result.uri);
   };
   
 
   const handleCategoryChange = (value) => {
          setSelectedCategory(value.value);
-       };
+  };
 
   return (
     <ScrollView>
@@ -139,7 +171,6 @@ const CreateCourses = ({ navigation }) => {
           <View style={styles.videBtn}>
             {/* <ImagePickerForm /> */}
             <Button text="Fotoğraf Yükle" onPress={pickImage} />
-            {image && <Image source={{ uri: image }} style={styles.image} />}
           </View>
         </View>
       </View>
@@ -154,7 +185,7 @@ const CreateCourses = ({ navigation }) => {
         onSelect={(option) => setFree(option.value)}
         value={free}
       />
-      <Input placeholder="99TL" label="Kurs Ücreti" onChangeText={setPrice} />
+      <Input label="Kurs Ücreti" onChangeText={setPrice} />
       <Text className="ml-3 text-lg"> Kurs Kategorisi </Text>
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
@@ -191,7 +222,7 @@ const CreateCourses = ({ navigation }) => {
       />
       <View>
         <Text style={styles.header}> Kurs Bölümleri Ekle </Text>
-        <Input
+        {/* <Input
           placeholder="React Native Giriş.."
           label="Bölüm Adı"
           onChangeText={setChapterName}
@@ -220,7 +251,7 @@ const CreateCourses = ({ navigation }) => {
           label="Bölüm No"
           onChangeText={setChapterNo}
           value={chapterNo}
-        />
+        /> */}
       </View>
       <Button text="Kursu Yükle" onPress={handleSubmit} />
     </ScrollView>

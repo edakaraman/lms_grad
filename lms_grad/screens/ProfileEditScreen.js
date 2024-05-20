@@ -23,7 +23,7 @@ const ProfileEditScreen = () => {
     setLastName(user.lastName);
     setEmail(user.emailAddresses[0].emailAddress);
   }, [user]);
-
+  
   // Update Clerk user data
   const onSaveUser = async () => {
     try {

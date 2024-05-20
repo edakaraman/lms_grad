@@ -29,7 +29,7 @@ export default function App() {
      publishableKey={publishableKey}
      >
     <ClerkProvider
-      publishableKey={Constants.expoConfig.extra.clerkPublishableKey}
+      publishableKey={"pk_test_YXJyaXZpbmctcmFjZXItOTIuY2xlcmsuYWNjb3VudHMuZGV2JA"}
     >
       <UserRoleContext.Provider value={{ userRole, setUserRole }}>
         <CompleteChapterContext.Provider value={{isChapterComplete,setIsChapterComplete}}>
@@ -58,7 +58,7 @@ export default function App() {
                     ),
                   }}
                 />
-                    <Tab.Screen
+                   {/*<Tab.Screen
                       name="İstatistik"
                       component={StatisticsScreen}
                       options={{
@@ -70,7 +70,7 @@ export default function App() {
                           />
                         ),
                       }}
-                    />    
+                    />   */}
                 {userRole === "öğretmen" && (
                   <>
                     <Tab.Screen

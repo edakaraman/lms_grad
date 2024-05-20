@@ -252,6 +252,7 @@ export const createCourse = async ({
   price,
   free,
   selectedCategory,
+  coverPhoto
 }) => {
   const mutationQuery = gql`
     mutation MyMutation {
@@ -264,6 +265,7 @@ export const createCourse = async ({
           free: ${free}
           authorEmail: "${authorEmail}"
           tag: ${selectedCategory}
+          banner: { connect: { id: "${coverPhoto}" } }
         }
       ) {
         id
@@ -432,10 +434,10 @@ export const idToCourse = async (courseId) => {
 };
 
 
-export const getChapterCompletionStatus = async (courseId, email) => {
+export const getChapterCompletionStatus = async (email) => {
   const query = gql`
     query MyQuery {
-      userEnrollCourses(where: { courseId: $courseId, userEmail: $email }) {
+      userEnrollCourses(where: { userEmail: $email }) {
         completedChapter {
           ... on CompletedChapter {
             isCompleted
@@ -448,4 +450,20 @@ export const getChapterCompletionStatus = async (courseId, email) => {
 
   const result = await request(MASTER_URL, query, variables);
   return result;
+};
+
+export const publishAsset = async (assetId) => {
+  const publishAssetMutation = gql`
+    mutation PublishAsset {
+      publishAsset(
+        where: { id: "${assetId}" }
+        to: PUBLISHED
+      ) {
+        id
+      }
+    }
+  `;
+
+  const publishResult = await request(MASTER_URL, publishAssetMutation);
+  return publishResult;
 };

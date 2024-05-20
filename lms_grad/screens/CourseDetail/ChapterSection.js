@@ -40,7 +40,7 @@ export default function ChapterSection({ chapterList, userEnrolledCourse }) {
     return resp;
   }
 
-  
+
   return (
     chapterList && (
       <View className="p-2 bg-white mt-5 rounded-2xl">

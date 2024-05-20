@@ -10,7 +10,12 @@ const RadioButton = ({ options, initialSelectedValue = null, onSelect }) => {
 
   const handleSelectOption = (option) => {
     setSelectedOption(option.value);
-    onSelect(option.value);
+    if(initialSelectedValue !== null) {
+      onSelect(option.value);
+    }
+    else{
+      onSelect(option);
+    }
   };
 
   return (

@@ -19,7 +19,13 @@ const CreateCourses = ({ navigation }) => {
   const [free, setFree] = useState(null); 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [coverPhoto, setCoverPhoto] = useState(null);
-
+  
+  //chapter
+  const [chapterName,setChapterName] = useState("");
+  const [chapterDesc,setChapterDesc] = useState("");
+  const [chapterNum,setChapterNum] = useState("");
+  const [chapterVideo, setChapterVideo] = useState(null);
+ 
   const HYGRAPH_ASSET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE3MTYxMjcwNTgsImF1ZCI6WyJodHRwczovL2FwaS1ldS13ZXN0LTIuaHlncmFwaC5jb20vdjIvY2xza3BxbHQ2M3dwZzAxdXBsbTRuMHQ3MS9tYXN0ZXIiLCJtYW5hZ2VtZW50LW5leHQuZ3JhcGhjbXMuY29tIl0sImlzcyI6Imh0dHBzOi8vbWFuYWdlbWVudC1ldS13ZXN0LTIuaHlncmFwaC5jb20vIiwic3ViIjoiNTg3OGUxZDMtNWJjMy00YzZkLTgwMzMtZDgyMWI2MmI5ZDhkIiwianRpIjoiY2x3ZGxxcGF2ajRobTA4anQ0MDZpYWxobSJ9.f1tncbqNT1xDpQgxtYhOlUAY3liLKUoaYAGVc6xxT7Su-0a6bmB3uKGULbPCcHKxocva8HfGtDnMczGpC1LZvoIQy9FrVftHHI5RublU2ZSOWpHnLGPxN9_QfC6reSSSWBgCCdIiq2sUblunM8DtGDmkTIpo75fYpoizeZGXNywXrg3tGk4vJVoBbSVBePM8Qx7fVF2rc7bYOCyGufgpnVo5-Rv_ZDtj-_0TTk2br4Vf6fKH92oBrKKBOUQOjU2IVyux7FOQQANCDaSmnVyqsbx6-zc1y5izKkC545hg9zMuoqhpTgfVwfJJekEGzDpXBSt4rqUACFVsbz_Xr0utvroQrEJQ97GMk8m-twOxSCeO00PJlDDupT3USDN7pADX5XCs_vLy0_9AMFxmv3ID4XvGggtp2d-a-TeQKtkT-DRg8x4O-ZaaT4w7L7Bg_Y9nh-ibVpFk9gtg5C9mtIt9bFHzgKFrblO24f-Tk-8MB2P1FLrnaJy9EMnU8WCcIDdQh8-notWa5AE4Xj6hcWxCUX269WOLVlp2i2_s4bXg1ClsopdYJ6LgeKzHkmIT2U1ZJcoDAa_WOd6o4_B8K_UqH8p64XiaOlR-LefJDmPbD59b26q2laqpf4BUsjBEbcH8s-TnFHRNqTWOOJq-c5i6ziGNAN6EprV53kX99S-r6iU';
   const HYGRAPH_URL = "https://api-eu-west-2.hygraph.com/v2/clskpqlt63wpg01uplm4n0t71/master";
 
@@ -83,7 +89,7 @@ const handleSubmit = async () => {
         const publishAssetResult = await publishAsset(coverPhotoId);
         console.log("Asset yayınlandı:", publishAssetResult);
       }
-  
+   
       const courseData = {
         name,
         description,
@@ -93,6 +99,9 @@ const handleSubmit = async () => {
         authorEmail: user.primaryEmailAddress.emailAddress,
         selectedCategory, 
         coverPhoto: coverPhotoId,
+        chapterName,
+        chapterDesc,
+        chapterNum: parseFloat(chapterNum),
       };
   
       const result = await createCourse(courseData);
@@ -143,7 +152,7 @@ const handleSubmit = async () => {
   
 
   const handleCategoryChange = (value) => {
-         setSelectedCategory(value.value);
+    setSelectedCategory(value.value);
   };
 
   return (
@@ -222,7 +231,7 @@ const handleSubmit = async () => {
       />
       <View>
         <Text style={styles.header}> Kurs Bölümleri Ekle </Text>
-        {/* <Input
+        <Input
           placeholder="React Native Giriş.."
           label="Bölüm Adı"
           onChangeText={setChapterName}
@@ -234,6 +243,11 @@ const handleSubmit = async () => {
           onChangeText={setChapterDesc}
           value={chapterDesc}
         />
+        <Input
+          label="Bölüm Numarası"
+          onChangeText={setChapterNum}
+          value={chapterNum}
+        />
         <View>
           <Text style={styles.category}> Video </Text>
           <View style={styles.imageContainer}>
@@ -242,16 +256,10 @@ const handleSubmit = async () => {
               source={require("./.././images/photo.jpg")}
             />
             <View style={styles.videBtn}>
-              <VideoPickerForm onChange={console.log} />
+              <VideoPickerForm onChange={console.log("eklendi")} />
             </View>
           </View>
         </View>
-        <Input
-          placeholder="1"
-          label="Bölüm No"
-          onChangeText={setChapterNo}
-          value={chapterNo}
-        /> */}
       </View>
       <Button text="Kursu Yükle" onPress={handleSubmit} />
     </ScrollView>

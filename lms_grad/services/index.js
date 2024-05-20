@@ -252,7 +252,10 @@ export const createCourse = async ({
   price,
   free,
   selectedCategory,
-  coverPhoto
+  coverPhoto,
+  chapterName,
+  chapterDesc,
+  chapterNum,
 }) => {
   const mutationQuery = gql`
     mutation MyMutation {
@@ -266,6 +269,14 @@ export const createCourse = async ({
           authorEmail: "${authorEmail}"
           tag: ${selectedCategory}
           banner: { connect: { id: "${coverPhoto}" } }
+          chapter: {create: {Chapter: {
+            name: "${chapterName}", 
+            chapterNumber: ${chapterNum}, 
+            shortDesc: "${chapterDesc}",
+          }
+          }
+        }
+
         }
       ) {
         id

@@ -4,7 +4,6 @@ import { Alert, Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import RadioButton from "../components/RadioButton";
-import VideoPickerForm from "../components/VideoPickerForm";
 import { useUser } from "@clerk/clerk-expo";
 import { createCourse, GetCategory, publishAsset, publishCourse } from "../services";
 import { Dropdown } from "react-native-element-dropdown";
@@ -24,7 +23,7 @@ const CreateCourses = ({ navigation }) => {
   const [chapterName,setChapterName] = useState("");
   const [chapterDesc,setChapterDesc] = useState("");
   const [chapterNum,setChapterNum] = useState("");
-  const [chapterVideo, setChapterVideo] = useState(null);
+  const [videoUri, setVideoUri] = useState(null);
  
   const HYGRAPH_ASSET_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImdjbXMtbWFpbi1wcm9kdWN0aW9uIn0.eyJ2ZXJzaW9uIjozLCJpYXQiOjE3MTYxMjcwNTgsImF1ZCI6WyJodHRwczovL2FwaS1ldS13ZXN0LTIuaHlncmFwaC5jb20vdjIvY2xza3BxbHQ2M3dwZzAxdXBsbTRuMHQ3MS9tYXN0ZXIiLCJtYW5hZ2VtZW50LW5leHQuZ3JhcGhjbXMuY29tIl0sImlzcyI6Imh0dHBzOi8vbWFuYWdlbWVudC1ldS13ZXN0LTIuaHlncmFwaC5jb20vIiwic3ViIjoiNTg3OGUxZDMtNWJjMy00YzZkLTgwMzMtZDgyMWI2MmI5ZDhkIiwianRpIjoiY2x3ZGxxcGF2ajRobTA4anQ0MDZpYWxobSJ9.f1tncbqNT1xDpQgxtYhOlUAY3liLKUoaYAGVc6xxT7Su-0a6bmB3uKGULbPCcHKxocva8HfGtDnMczGpC1LZvoIQy9FrVftHHI5RublU2ZSOWpHnLGPxN9_QfC6reSSSWBgCCdIiq2sUblunM8DtGDmkTIpo75fYpoizeZGXNywXrg3tGk4vJVoBbSVBePM8Qx7fVF2rc7bYOCyGufgpnVo5-Rv_ZDtj-_0TTk2br4Vf6fKH92oBrKKBOUQOjU2IVyux7FOQQANCDaSmnVyqsbx6-zc1y5izKkC545hg9zMuoqhpTgfVwfJJekEGzDpXBSt4rqUACFVsbz_Xr0utvroQrEJQ97GMk8m-twOxSCeO00PJlDDupT3USDN7pADX5XCs_vLy0_9AMFxmv3ID4XvGggtp2d-a-TeQKtkT-DRg8x4O-ZaaT4w7L7Bg_Y9nh-ibVpFk9gtg5C9mtIt9bFHzgKFrblO24f-Tk-8MB2P1FLrnaJy9EMnU8WCcIDdQh8-notWa5AE4Xj6hcWxCUX269WOLVlp2i2_s4bXg1ClsopdYJ6LgeKzHkmIT2U1ZJcoDAa_WOd6o4_B8K_UqH8p64XiaOlR-LefJDmPbD59b26q2laqpf4BUsjBEbcH8s-TnFHRNqTWOOJq-c5i6ziGNAN6EprV53kX99S-r6iU';
   const HYGRAPH_URL = "https://api-eu-west-2.hygraph.com/v2/clskpqlt63wpg01uplm4n0t71/master";
@@ -89,7 +88,36 @@ const handleSubmit = async () => {
         const publishAssetResult = await publishAsset(coverPhotoId);
         console.log("Asset yayınlandı:", publishAssetResult);
       }
-   
+
+        let coverVideoId = null;
+        if (videoUri) {
+          const form = new FormData();
+          form.append('fileUpload', {
+            uri: videoUri,
+            name: videoUri.split('/').pop(),
+            type: 'video/mp4', 
+          });
+          
+          const uploadResponse = await fetch(`${HYGRAPH_URL}/upload`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${HYGRAPH_ASSET_TOKEN}`,
+              'Content-Type': 'multipart/form-data',
+            },
+            body: form,
+          });
+    
+          if (!uploadResponse.ok) {
+            throw new Error(`Upload failed with status ${uploadResponse.status}`);
+          }
+    
+          const responseData = await uploadResponse.json();
+          coverVideoId = responseData.id;
+    
+          const publishAssetResult = await publishAsset(coverVideoId);
+          console.log("Asset yayınlandı:", publishAssetResult);
+        }
+
       const courseData = {
         name,
         description,
@@ -102,6 +130,7 @@ const handleSubmit = async () => {
         chapterName,
         chapterDesc,
         chapterNum: parseFloat(chapterNum),
+        videoUri: coverVideoId,
       };
   
       const result = await createCourse(courseData);
@@ -134,20 +163,37 @@ const handleSubmit = async () => {
     });
   
     console.log(result);
-    if(result){
+    if( result.canceled !== true){
       Alert.alert("Kapak görseli eklendi!");
     }
   
     if (
       !result ||
-      result.cancelled ||
+      result.canceled ||
       !result.uri 
     ) {
-      Alert.alert("Hata", "Lütfen bir fotoğraf seçin.");
+      Alert.alert("Uyarı", "Lütfen bir fotoğraf seçin.");
       return;
     }
   
     setCoverPhoto(result.uri);
+  };
+  const pickVideo = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if(result.canceled !== true){
+      Alert.alert("Video eklendi!");
+    }
+
+    if (!result.canceled) {
+      setVideoUri(result.uri);
+      onChange(result.uri);
+    }
   };
   
 
@@ -256,7 +302,7 @@ const handleSubmit = async () => {
               source={require("./.././images/photo.jpg")}
             />
             <View style={styles.videBtn}>
-              <VideoPickerForm onChange={console.log("eklendi")} />
+              <Button text="Video Yükle" onPress={pickVideo} />
             </View>
           </View>
         </View>

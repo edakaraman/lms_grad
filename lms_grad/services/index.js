@@ -256,7 +256,9 @@ export const createCourse = async ({
   chapterName,
   chapterDesc,
   chapterNum,
+  videoUri,
 }) => {
+  const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
   const mutationQuery = gql`
     mutation MyMutation {
       createCourseList(
@@ -268,11 +270,13 @@ export const createCourse = async ({
           free: ${free}
           authorEmail: "${authorEmail}"
           tag: ${selectedCategory}
+          slug: "${slug}"
           banner: { connect: { id: "${coverPhoto}" } }
           chapter: {create: {Chapter: {
             name: "${chapterName}", 
             chapterNumber: ${chapterNum}, 
             shortDesc: "${chapterDesc}",
+            video: {connect: {id: "${videoUri}" }}
           }
           }
         }

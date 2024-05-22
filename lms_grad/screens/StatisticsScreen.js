@@ -1,18 +1,12 @@
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import React, { useState, useEffect } from "react";
 import {
-  LineChart,
   BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart,
 } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
-import { GetIstatisticCourse, deleteCourse, idToCourse } from "../services";
+import { GetIstatisticCourse } from "../services";
 import { useUser } from "@clerk/clerk-expo";
 import CourseTable from "../components/CourseTable";
-import EditCourse from "../components/EditCourse";
 
 export default function StatisticsScreen() {
   const { user } = useUser();
@@ -47,11 +41,6 @@ export default function StatisticsScreen() {
     labels: ["Ücretli", "Ücretsiz"],
     data: [percentagePaidCourses / 100, percentageFreeCourses / 100],
   };
-
-  // const data = {
-  //   labels: ["Swim", "Bike", "Run"], // optional
-  //   data: [0.4, 0.6, 0.8],
-  // };
 
   const totalEnrollments = courseCounterdata.reduce(
     (total, count) => total + count,
@@ -103,7 +92,7 @@ export default function StatisticsScreen() {
               backgroundColor: "#e26a00",
               backgroundGradientFrom: "#fb8c00",
               backgroundGradientTo: "#ffa726",
-              decimalPlaces: 0, // integer values for counterEnroll
+              decimalPlaces: 0, 
               color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
               style: {
@@ -136,9 +125,9 @@ export default function StatisticsScreen() {
                 },
               ],
             }}
-            width={Dimensions.get("window").width} // from react-native
+            width={Dimensions.get("window").width} 
             height={250}
-            yAxisInterval={1} // optional, defaults to 1
+            yAxisInterval={1} 
             yAxisSuffix="₺"
             chartConfig={{
               backgroundColor: "#87CEEB",

@@ -3,22 +3,58 @@ import { Alert, ScrollView, Text, View, StyleSheet } from "react-native";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import RadioButton from "../components/RadioButton"; // RadioButton bileşenini içeri aktarın
-import { updateCourse, publishCourse } from "../services";
+import { updateCourse, publishCourse,GetCategory } from "../services";
+import { Dropdown } from "react-native-element-dropdown";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const EditCourse = ({ courseInfos,id }) => {
-  const [name, setName] = useState(courseInfos.name);
-  const [description, setDescription] = useState(courseInfos.description);
-  const [totalChapters, setTotalChapters] = useState(String(courseInfos.totalChapters));
-  const [price, setPrice] = useState(String(courseInfos.price));
+  
+  const [name, setName] = useState(courseInfos.name === null ? "": courseInfos.name) ;
+  const [description, setDescription] = useState(courseInfos.description === null ? "": courseInfos.description);
+  const [price, setPrice] = useState(String(courseInfos.price === null ? "": courseInfos.price));
   const [selectedCategory, setSelectedCategory] = useState(courseInfos.tag ? courseInfos.tag.join(", ") : "");
   const [free, setFree] = useState(courseInfos.free); 
+
+  const [categories, setCategories] = useState([]);
+  const [isFocus, setIsFocus] = useState(false);
+
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value.value);
+  };
+
+  useEffect(() => {
+    GetCategory()
+      .then((resp) => {
+        if (resp && resp.courseLists) {
+          const filteredCategories = resp.courseLists.reduce(
+            (uniqueCategories, newCategory) => {
+              if (
+                !uniqueCategories.some(
+                  (existingCategory) =>
+                    existingCategory.tag === newCategory.tag[0]
+                )
+              ) {
+                uniqueCategories.push({ tag: newCategory.tag[0] });
+              }
+              return uniqueCategories;
+            },
+            []
+          );
+          setCategories(filteredCategories);
+        } else {
+          console.error("Geçersiz kategori yanıtı:", resp);
+        }
+      })
+      .catch((error) => {
+        console.error("Kategori alınırken bir hata oluştu:", error);
+      });
+  }, []); 
 
   const handleUpdate = () => {
     const courseData = {
       courseId: id,
       name: name,
       description: description,
-      totalChapters: parseInt(totalChapters),
       price: parseFloat(price),
       selectedCategory: selectedCategory,
       free: free,
@@ -49,20 +85,41 @@ const EditCourse = ({ courseInfos,id }) => {
         <Input label="Kurs Adı" value={name} onChangeText={setName} />
         <Input label="Kurs Açıklaması" value={description} onChangeText={setDescription} />
         <Input
-          label="Toplam Bölüm Sayısı"
-          value={totalChapters}
-          onChangeText={setTotalChapters}
-          keyboardType="numeric"
-        />
-        <Input
-          placeholder="99TL"
           label="Kurs Ücreti"
           value={price}
           onChangeText={setPrice}
           keyboardType="numeric"
         />
+        <Text style={styles.label}> Kurs Kategorisi </Text>
+        <Dropdown
+        style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={categories.map((category) => ({
+          label: category.tag,
+          value: category.tag,
+        }))}
+        search
+        searchPlaceholder="Ara..."
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={"Kategorilerimiz"}
+        value={selectedCategory}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={handleCategoryChange}
+        renderLeftIcon={() => (
+          <AntDesign
+            style={styles.icon}
+            color={isFocus ? "blue" : "black"}
+            name="Safety"
+            size={20}
+          />
+        )}
+      />
         <Input
-          placeholder="Ör: mobile"
           label="Kurs Kategorisi"
           value={selectedCategory}
           onChangeText={setSelectedCategory}
@@ -104,6 +161,22 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontSize:18,
+    marginLeft:10,
+  },
+  dropdown: {
+    width: "90%",
+    marginBottom: 16,
+    marginLeft: 17,
+    backgroundColor: "#FFFFFF",
+    padding: 7,
+  },
+  selectedValue: {
+    marginTop: 20,
+  },
+  category: {
+    marginTop: 20,
+    marginLeft: 12,
+    fontSize: 17,
   },
 });
 export default EditCourse;

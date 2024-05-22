@@ -216,39 +216,10 @@ export const FilteredCategoryCourseList = async (category) => {
 
 }
 
-// export const createCourse = async (authorEmail) => {
-//   const mutationQuery =
-//     gql`
-//     mutation MyMutation {
-//       createCourseList(
-//         data: {name: "", description: "", tag: expo, totalChapters: 10, price: 1.5, free: false}
-//       ) {
-//         banner {
-//           url
-//         }
-//         chapter {
-//           ... on Chapter {
-//             id
-//             name
-//             shortDesc
-//             video {
-//               url
-//             }
-//             chapterNumber
-//           }
-//         }
-//       }
-//     }
-//   `;
-//   const result = await request(MASTER_URL, mutationQuery);
-//   return result;
-// };
-
 export const createCourse = async ({
   name,
   description,
   authorEmail,
-  totalChapters,
   price,
   free,
   selectedCategory,
@@ -265,7 +236,6 @@ export const createCourse = async ({
         data: {
           name: "${name}"
           description: "${description}"
-          totalChapters: ${totalChapters}
           price: ${price}
           free: ${free}
           authorEmail: "${authorEmail}"
@@ -306,6 +276,35 @@ export const  publishCourse = async (courseId) => {
   const publishResult = await request(MASTER_URL, publishCourseMutation);
   return publishResult;
 };
+
+export const addChapter = async ({
+  courseId,
+  chapterName,
+  chapterNum,
+  chapterDesc,
+  videoUri,
+}) => {
+  const publishCourseMutation = gql`
+  mutation MyMutation {
+    updateCourseList(
+      data: {chapter: {create: {Chapter: {
+        data: {
+          name: "${chapterName}", 
+          chapterNumber: ${chapterNum}, 
+          shortDesc: "${chapterDesc}",
+          video: {connect: {id: "${videoUri}" }}
+       }
+     }}}}
+    where: { id: "${courseId}" }
+  ) {
+      id
+    }
+  }       
+  `;
+  const publishResult = await request(MASTER_URL, publishCourseMutation);
+  return publishResult;
+};
+
 
 export const counterEnroll = async ( courseId, counter ) => {
   const mutationQuery = gql`
@@ -400,8 +399,7 @@ export const completedChapterInfo = async (courseId,userEmail) => {
 };
 
 
-
-export const updateCourse = async ({ courseId, name, description, totalChapters, price, selectedCategory }) => {
+export const updateCourse = async ({ courseId, name, description, price, selectedCategory }) => {
   const slug = name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
   
   const free = price > 0 ? false : true;
@@ -412,7 +410,6 @@ export const updateCourse = async ({ courseId, name, description, totalChapters,
         data: {
           name: "${name}"
           description: "${description}"
-          totalChapters: ${totalChapters}
           price: ${price}
           free: ${free}
           tag: ${selectedCategory}
@@ -426,10 +423,6 @@ export const updateCourse = async ({ courseId, name, description, totalChapters,
   const updateResult = await request(MASTER_URL, updateCourseMutation);
   return updateResult;
 };
-
-
-
-
 export const idToCourse = async (courseId) => {
   const query = gql`
   query MyQuery {

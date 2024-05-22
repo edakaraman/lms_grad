@@ -1,31 +1,38 @@
 import React, { useState } from "react";
-import { View, Text, Button, StyleSheet, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import {
   deleteCourse,
   idToCourse,
-  publishCourse,
-  updateCourse,
 } from "../services";
 import EditCourse from "./EditCourse";
+import { AntDesign } from "@expo/vector-icons";
+import AddChapter from "./AddChapter";
 
 const CourseTable = ({ data }) => {
   const [courseList, setCourseList] = useState(null);
   const [editing, setEditing] = useState(false);
-  const [courseData, setCourseData] = useState(data); // Yeni oluşturulan dizi
-  const [courseId,setCourseId] = useState(null);
+  const [courseId, setCourseId] = useState(null);
+  const [chapterEditing,setChapterEditing] = useState(false);
 
   const handleDelete = (courseId) => {
-    console.log("course id:", courseId);
     deleteCourse(courseId).then(() => {
+      setEditing(false);
       Alert.alert("Silme İşlemi Başarılı!", "Kurs silindi.");
     });
   };
- // console.log("sdkskdf",courseList);
 
   const openToModal = (courseId) => {
     setEditing(true);
     idToCourse(courseId).then((resp) => {
       setCourseList(resp.courseList);
+      setCourseId(courseId);
+    });
+  };
+
+  const addChapter = (courseId) => {
+    setEditing(false);
+    setChapterEditing(true);
+    idToCourse(courseId).then((resp) => {
       setCourseId(courseId);
     });
   };
@@ -40,12 +47,24 @@ const CourseTable = ({ data }) => {
         <View key={index} style={styles.row}>
           <Text style={styles.courseName}>{course.name}</Text>
           <View style={styles.row2}>
-            <Button title="Sil" onPress={() => handleDelete(course.id)} />
-            <Button title="Düzenle" onPress={() => openToModal(course.id)} />
+            <TouchableOpacity onPress={() => handleDelete(course.id)}>
+              <AntDesign name="delete" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => openToModal(course.id)}>
+              <AntDesign name="edit" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => addChapter(course.id) }>
+              <AntDesign name="addfile" size={24} color="black" />
+            </TouchableOpacity>
           </View>
         </View>
       ))}
-      {editing && courseList && <EditCourse id={courseId} courseInfos={courseList} />}
+      {editing && courseList && (
+        <EditCourse id={courseId} courseInfos={courseList} />
+      )}
+      {chapterEditing && (
+        <AddChapter id = {courseId} />
+      )}
     </View>
   );
 };

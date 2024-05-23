@@ -9,11 +9,11 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 const EditCourse = ({ courseInfos,id }) => {
   
-  const [name, setName] = useState(courseInfos.name === null ? "": courseInfos.name) ;
-  const [description, setDescription] = useState(courseInfos.description === null ? "": courseInfos.description);
-  const [price, setPrice] = useState(String(courseInfos.price === null ? "": courseInfos.price));
-  const [selectedCategory, setSelectedCategory] = useState(courseInfos.tag ? courseInfos.tag.join(", ") : "");
-  const [free, setFree] = useState(courseInfos.free); 
+  const [name, setName] = useState("") ;
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [free, setFree] = useState(""); 
 
   const [categories, setCategories] = useState([]);
   const [isFocus, setIsFocus] = useState(false);
@@ -21,6 +21,14 @@ const EditCourse = ({ courseInfos,id }) => {
   const handleCategoryChange = (value) => {
     setSelectedCategory(value.value);
   };
+  
+  useEffect(( ) => {
+    setName(courseInfos.name === null ? "": courseInfos.name) ;
+    setDescription(courseInfos.description === null ? "": courseInfos.description);
+    setPrice(String(courseInfos.price === null ? "": courseInfos.price));
+    setSelectedCategory(courseInfos.tag ? courseInfos.tag.join(", ") : "");
+    setFree(courseInfos.free); 
+},[id]);
 
   useEffect(() => {
     GetCategory()
@@ -105,7 +113,7 @@ const EditCourse = ({ courseInfos,id }) => {
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder={"Kategorilerimiz"}
+        placeholder={"Kategoriler"}
         value={selectedCategory}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}

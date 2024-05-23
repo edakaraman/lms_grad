@@ -58,7 +58,7 @@ export default function App() {
                     ),
                   }}
                 />
-                      {/* <Tab.Screen
+                       {/* <Tab.Screen
                       name="İstatistik"
                       component={StatisticsScreen}
                       options={{

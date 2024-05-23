@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import {
   deleteCourse,
+  deleteEnrolledCourse,
   idToCourse,
 } from "../services";
 import EditCourse from "./EditCourse";
@@ -18,6 +19,9 @@ const CourseTable = ({ data }) => {
     deleteCourse(courseId).then(() => {
       setEditing(false);
       Alert.alert("Silme İşlemi Başarılı!", "Kurs silindi.");
+    });
+    deleteEnrolledCourse(courseId).then(() => {
+      console.log("tüm kurs kayıt verileri silindi..");
     });
   };
 

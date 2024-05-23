@@ -367,6 +367,7 @@ export const deleteCourse = async (courseId) => {
       mutation MyMutation {
         deleteCourseList(where: {id: "${courseId}"}) {
           id
+          name
         }
       }
     `;
@@ -473,5 +474,18 @@ export const publishAsset = async (assetId) => {
   `;
 
   const publishResult = await request(MASTER_URL, publishAssetMutation);
+  return publishResult;
+};
+
+export const deleteEnrolledCourse = async (courseId) => {
+  const deleteUserEnrolledCourse = gql`
+  mutation MyMutation {
+    deleteManyUserEnrollCourses(where: { courseId: "${courseId}" }) {
+      count
+    }
+  }
+  `;
+
+  const publishResult = await request(MASTER_URL, deleteUserEnrolledCourse);
   return publishResult;
 };

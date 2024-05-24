@@ -34,7 +34,6 @@ export default function CourseDetailScreen() {
   const UserEnrollCourse = () => {
     enrollCourse(params.course.id,user.primaryEmailAddress.emailAddress)
     .then(resp => {
-     //console.log(resp);
      if(resp){
       Toast.show({
         type: 'success',
@@ -44,9 +43,7 @@ export default function CourseDetailScreen() {
 
       GetCounter(params.course.id).then(resp => {
         let counterEnrollValue = resp.courseList.counterEnroll;
-        //console.log(counterEnrollValue); 
         counterEnrollValue = counterEnrollValue + 1 ;
-        //counter'ın değerini update mutationa göndermemiz lazım
         counterEnroll(params.course.id,counterEnrollValue).then(resp => {
             console.log(resp);
           });

@@ -1,18 +1,16 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import {
-  deleteCourse,
-  deleteEnrolledCourse,
-  idToCourse,
-} from "../services";
+import { deleteCourse, deleteEnrolledCourse, idToCourse } from "../services";
 import EditCourse from "./EditCourse";
 import { AntDesign } from "@expo/vector-icons";
 import AddChapter from "./AddChapter";
+import EditChapter from "./EditChapter";
 
 const CourseTable = ({ data }) => {
   const [courseList, setCourseList] = useState(null);
   const [editing, setEditing] = useState(false);
   const [courseId, setCourseId] = useState(null);
+  const [chapterAdding, setChapterAdding] = useState(false);
   const [chapterEditing,setChapterEditing] = useState(false);
 
   const handleDelete = (courseId) => {
@@ -26,6 +24,8 @@ const CourseTable = ({ data }) => {
   };
 
   const openToModal = (courseId) => {
+    setChapterEditing(false);
+    setChapterAdding(false);
     setEditing(true);
     idToCourse(courseId).then((resp) => {
       setCourseList(resp.courseList);
@@ -35,10 +35,30 @@ const CourseTable = ({ data }) => {
 
   const addChapter = (courseId) => {
     setEditing(false);
+    setChapterAdding(true);
+    idToCourse(courseId).then((resp) => {
+      setCourseId(courseId);
+    });
+  };
+
+  const editingChapter = (courseId) => {
+    setEditing(false);
+    setChapterAdding(false);
     setChapterEditing(true);
     idToCourse(courseId).then((resp) => {
       setCourseId(courseId);
     });
+  };
+
+  
+  const closeEditing = () => {
+    if (editing) {
+      setEditing(false);
+    } else if (chapterAdding) {
+      setChapterAdding(false);
+    } else if (chapterEditing) {
+      setChapterEditing(false);
+    }
   };
 
   return (
@@ -51,14 +71,25 @@ const CourseTable = ({ data }) => {
         <View key={index} style={styles.row}>
           <Text style={styles.courseName}>{course.name}</Text>
           <View style={styles.row2}>
+            <TouchableOpacity onPress={() => editingChapter(course.id)}>
+              <AntDesign name="eyeo" size={24} color="black" />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => handleDelete(course.id)}>
               <AntDesign name="delete" size={24} color="black" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => openToModal(course.id)}>
               <AntDesign name="edit" size={24} color="black" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => addChapter(course.id) }>
+            <TouchableOpacity onPress={() => addChapter(course.id)}>
               <AntDesign name="addfile" size={24} color="black" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={closeEditing}>
+              <AntDesign
+                style={styles.header}
+                name="closecircle"
+                size={24}
+                color="blue"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -66,9 +97,8 @@ const CourseTable = ({ data }) => {
       {editing && courseList && (
         <EditCourse id={courseId} courseInfos={courseList} />
       )}
-      {chapterEditing && (
-        <AddChapter id = {courseId} />
-      )}
+      {chapterAdding && <AddChapter id={courseId} />}
+      {chapterEditing && <EditChapter courseId={courseId} />}
     </View>
   );
 };
@@ -107,6 +137,11 @@ const styles = StyleSheet.create({
   },
   courseName: {
     fontSize: 16,
+  },
+  flx: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
 });
 

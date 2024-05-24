@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, Text, View, StyleSheet } from "react-native";
 import Input from "../components/Input";
 import Button from "../components/Button";
-import RadioButton from "../components/RadioButton"; // RadioButton bileşenini içeri aktarın
+import RadioButton from "../components/RadioButton";
 import { updateCourse, publishCourse,GetCategory } from "../services";
 import { Dropdown } from "react-native-element-dropdown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 const EditCourse = ({ courseInfos,id }) => {
-  
+
   const [name, setName] = useState("") ;
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");

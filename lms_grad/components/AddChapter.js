@@ -1,10 +1,22 @@
-import { View, Text, Alert, StyleSheet, Image,TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState } from "react";
-import { addChapter, publishAsset, publishCourse } from "../services";
+import {
+  addChapter,
+  GetTotalChapters,
+  publishAsset,
+  publishCourse,
+  totalChaptersCounter,
+} from "../services";
 import * as ImagePicker from "expo-image-picker";
 import Input from "./Input";
 import Button from "./Button";
-import { AntDesign } from "@expo/vector-icons";
 
 const AddChapter = ({ id }) => {
   const [chapterName, setChapterName] = useState("");
@@ -61,13 +73,22 @@ const AddChapter = ({ id }) => {
 
       const publishResult = await publishCourse(result.updateCourseList.id);
       console.log("Kurs yayınlandı:", publishResult);
+
+      //total chapter
+      const resp = await GetTotalChapters(id);
+      let counterEnrollValue = resp.courseList.totalChapters;
+      counterEnrollValue = counterEnrollValue + 1;
+      const updateResult = await totalChaptersCounter(id, counterEnrollValue);
+      console.log("Sonuçlar: ", updateResult);
     } catch (error) {
       console.error("Kurs eklenirken bir hata oluştu:", error);
       Alert.alert("Hata", "Bölüm eklenirken bir hata oluştu!");
     }
+    setChapterName("");
+    setChapterDesc("");
+    setChapterNum("");
   };
 
- 
   const pickVideo = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
@@ -89,7 +110,9 @@ const AddChapter = ({ id }) => {
   return (
     <View>
       <View>
-        <Text style={styles.header}> Bölüm Ekle </Text>
+        <View style={styles.flx}>
+          <Text style={styles.header}> Bölüm Ekle </Text>
+        </View>
         <Input
           label="Bölüm Adı"
           onChangeText={setChapterName}
@@ -131,6 +154,11 @@ const styles = StyleSheet.create({
     marginTop: 50,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  flx: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   category: {
     marginTop: 20,

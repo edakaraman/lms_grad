@@ -4,7 +4,6 @@ import { Video, ResizeMode } from "expo-av";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Alert } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
-import { completedChapterInfo, getChapterCompletionStatus } from "../../services";
 
 export default function Content({ content, onChapterFinish }) {
   const video = React.useRef(null);

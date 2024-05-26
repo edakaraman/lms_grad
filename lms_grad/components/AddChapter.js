@@ -84,9 +84,6 @@ const AddChapter = ({ id }) => {
       console.error("Kurs eklenirken bir hata oluştu:", error);
       Alert.alert("Hata", "Bölüm eklenirken bir hata oluştu!");
     }
-    setChapterName("");
-    setChapterDesc("");
-    setChapterNum("");
   };
 
   const pickVideo = async () => {

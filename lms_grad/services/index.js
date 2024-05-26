@@ -549,42 +549,57 @@ export const getChapterInfos = async (courseId) => {
   return result;
 };
 
-export const updateChapterInfos = async ( {
-  courseId, 
+export const updateChapterInfos = async ({
+  courseId,
   chapterId,
   chapterNum,
   chapterName,
-  chapterDesc 
+  chapterDesc,
+  videoUri,
 }) => {
   const mutationQuery = gql`
-  mutation MyMutation {
+  mutation MyMutation(
+    $courseId: ID!,
+    $chapterId: ID!,
+    $chapterNum: Int!,
+    $chapterName: String!,
+    $chapterDesc: String!,
+    $videoUri: ID!
+  ) {
     updateCourseList(
-      data: {chapter: {update: 
-        {
-          Chapter: { where: {id: "${chapterId}"}, 
-          data: {
-            chapterNumber: ${chapterNum}, 
-            name: "${chapterName}", 
-            shortDesc: "${chapterDesc}",
-    
+      data: {
+        chapter: {
+          update: {
+            Chapter: {
+              where: { id: $chapterId }
+              data: {
+                chapterNumber: $chapterNum
+                name: $chapterName
+                shortDesc: $chapterDesc
+                video:  {connect: {id: $videoUri }}
+              }
+            }
           }
-        }}}}
-      where: {id: "${courseId}"}
+        }
+      }
+      where: { id: $courseId }
     ) {
       id
     }
-    publishCourseList(where: {id: "` +courseId +`"}, to: PUBLISHED) {
-      totalChapters
-    }
-  `;
-  try {
-    const result = await request(MASTER_URL, mutationQuery);
-    return result;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
+  `;
+  const publishResult = await request(MASTER_URL, mutationQuery, {
+    courseId,
+    chapterId,
+    chapterNum,
+    chapterName,
+    chapterDesc,
+    videoUri,
+  });
+  
+  return publishResult;
 };
+
 
 export const deleteChapter = async ({courseId,chapterId}) => {
   const handleDeleteChapter = gql`

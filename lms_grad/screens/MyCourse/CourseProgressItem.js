@@ -11,10 +11,10 @@ export default function CourseProgressItem({ item,completedChapter,progress }) {
           className="w-full h-[170px] rounded-2xl"
         />
         <View className="p-2 pb-0">
-          <Text className="text-lg"> {item.name} </Text>
+          <Text className="text-lg"> {item?.name} </Text>
         </View>
         <View className="p-2 pt-0">
-          <Text className="text-base font-bold text-blue-800"> {item.tag} </Text>
+          <Text className="text-base font-bold text-blue-800"> {item?.tags} </Text>
         </View>
         <View className="flex flex-row items-center gap-1 mt-1 ml-2">
           <Ionicons name="book-outline" size={18} color="black" />

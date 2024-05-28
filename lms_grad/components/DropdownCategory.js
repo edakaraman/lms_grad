@@ -39,7 +39,7 @@ const DropdownCategory = () => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={categories.map(category => ({ label: category.tag, value: category.tag }))}
+        data={categories.map(category => ({ label: category.tags, value: category.tags }))}
         search
         searchPlaceholder="Ara..."
         maxHeight={300}

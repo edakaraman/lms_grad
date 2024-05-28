@@ -26,37 +26,38 @@ const EditCourse = ({ courseInfos,id }) => {
     setName(courseInfos.name === null ? "": courseInfos.name) ;
     setDescription(courseInfos.description === null ? "": courseInfos.description);
     setPrice(String(courseInfos.price === null ? "": courseInfos.price));
-    setSelectedCategory(courseInfos.tag ? courseInfos.tag.join(", ") : "");
+    setSelectedCategory(courseInfos?.tags);
     setFree(courseInfos.free); 
 },[id]);
 
-  useEffect(() => {
-    GetCategory()
-      .then((resp) => {
-        if (resp && resp.courseLists) {
-          const filteredCategories = resp.courseLists.reduce(
-            (uniqueCategories, newCategory) => {
-              if (
-                !uniqueCategories.some(
-                  (existingCategory) =>
-                    existingCategory.tag === newCategory.tag[0]
-                )
-              ) {
-                uniqueCategories.push({ tag: newCategory.tag[0] });
-              }
-              return uniqueCategories;
-            },
-            []
-          );
-          setCategories(filteredCategories);
-        } else {
-          console.error("Geçersiz kategori yanıtı:", resp);
-        }
-      })
-      .catch((error) => {
-        console.error("Kategori alınırken bir hata oluştu:", error);
-      });
-  }, []); 
+useEffect(() => {
+  GetCategory()
+    .then((resp) => {
+      if (resp && resp.courseLists) {
+        const filteredCategories = resp.courseLists.reduce(
+          (uniqueCategories, newCategory) => {
+            if (
+              newCategory.tags.trim() !== "" &&
+              !uniqueCategories.some(
+                (existingCategory) =>
+                  existingCategory.tags === newCategory.tags
+              )
+            ) {
+              uniqueCategories.push({ tags: newCategory.tags });
+            }
+            return uniqueCategories;
+          },
+          []
+        );
+        setCategories(filteredCategories);
+      } else {
+        console.error("Geçersiz kategori yanıtı:", resp);
+      }
+    })
+    .catch((error) => {
+      console.error("Kategori alınırken bir hata oluştu:", error);
+    });
+}, []);
 
   const handleUpdate = () => {
     const courseData = {
@@ -64,7 +65,7 @@ const EditCourse = ({ courseInfos,id }) => {
       name: name,
       description: description,
       price: parseFloat(price),
-      selectedCategory: selectedCategory,
+      tags:selectedCategory,
       free: free,
     };
 
@@ -105,8 +106,8 @@ const EditCourse = ({ courseInfos,id }) => {
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={categories.map((category) => ({
-          label: category.tag,
-          value: category.tag,
+          label: category.tags,
+          value: category.tags,
         }))}
         search
         searchPlaceholder="Ara..."

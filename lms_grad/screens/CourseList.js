@@ -11,40 +11,68 @@ const CourseList = ({ searchText }) => {
   const [categories, setCategories] = useState([]);
   const [activeIndex, setActiveIndex] = useState(null);
   const navigation = useNavigation();
+  const [mostPopularCourse, setMostPopularCourse] = useState("");
 
   useEffect(() => {
     getCourses();
     getCategory();
-  }, [searchText]);
+  }, [searchText,courseList]);
 
   const getCourses = () => {
-    getCourseList().then((resp) => {
-      setCourseList(resp.courseLists);
-    }).catch((error) => {
-      console.error("Kurslar alınırken bir hata oluştu:", error);
-    });
+    getCourseList()
+      .then((resp) => {
+        if (resp?.courseLists) {
+          let sortedCourseList = resp.courseLists.sort((a, b) => b.counterEnroll - a.counterEnroll);
+          setCourseList(sortedCourseList);
+  
+          const mostPopularCourseName = sortedCourseList.length > 0 ? sortedCourseList[0].name : null;
+          //console.log("En popüler kursun ismi:", mostPopularCourseName);
+          setMostPopularCourse(mostPopularCourseName);
+        }
+      })
+      .catch((error) => {
+        console.error("Kurslar alınırken bir hata oluştu:", error);
+      });
   };
 
   const getCategory = () => {
-    GetCategory().then((resp) => {
-      if (resp && resp.courseLists) {
-        const filteredCategories = resp.courseLists.reduce((uniqueCategories, newCategory) => {
-          if (!uniqueCategories.some((existingCategory) => existingCategory.tag === newCategory.tag[0])) {
-            uniqueCategories.push({ tag: newCategory.tag[0] });
+    GetCategory()
+      .then((resp) => {
+        if (resp && resp.courseLists) {
+          let sortedCategories = resp.courseLists.sort((a, b) => b.counterEnroll - a.counterEnroll);
+          const filteredCategories = sortedCategories.reduce((uniqueCategories, newCategory) => {
+            if (typeof newCategory.tags === 'string') {
+              if (newCategory.tags.trim() !== "" && !uniqueCategories.some((existingCategory) => existingCategory.tag === newCategory.tags)) {
+                uniqueCategories.push({ tag: newCategory.tags, isPopular: false });
+              }
+            } else if (Array.isArray(newCategory.tags)) {
+              newCategory.tags.forEach(tag => {
+                if (tag.trim() !== "" && !uniqueCategories.some((existingCategory) => existingCategory.tag === tag)) {
+                  uniqueCategories.push({ tag, isPopular: false });
+                }
+              });
+            }
+            return uniqueCategories;
+          }, []);
+          
+          const mostPopularCategory = filteredCategories.length > 0 ? filteredCategories[0] : null;
+  
+          if (mostPopularCategory) {
+            mostPopularCategory.isPopular = true;
           }
-          return uniqueCategories;
-        }, []);
-        setCategories(filteredCategories);
-      } else {
-        console.error("Geçersiz kategori yanıtı:", resp);
-      }
-    }).catch((error) => {
-      console.error("Kategori alınırken bir hata oluştu:", error);
-    });
+  
+          setCategories(filteredCategories);
+        } else {
+          console.error("Geçersiz kategori yanıtı:", resp);
+        }
+      })
+      .catch((error) => {
+        console.error("Kategori alınırken bir hata oluştu:", error);
+      });
   };
 
   const handleCategoryPress = async (category, index) => {
-    setActiveIndex(index); 
+    setActiveIndex(index);
     try {
       const result = await filteredCourseList(category.tag);
       setCourseList(result.courseLists);
@@ -59,7 +87,7 @@ const CourseList = ({ searchText }) => {
       return result;
     } catch (error) {
       console.error("filteredCourseList hatası:", error);
-      throw error; 
+      throw error;
     }
   };
 
@@ -81,10 +109,10 @@ const CourseList = ({ searchText }) => {
         keyExtractor={(item) => item.id.toString()}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity
             onPress={() => navigation.navigate("CourseDetail", { course: item })}>
-            <CourseItem item={item} />
+            <CourseItem item={item} isPopular={item.name === mostPopularCourse} />
           </TouchableOpacity>
         )}
       />
@@ -117,4 +145,3 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-

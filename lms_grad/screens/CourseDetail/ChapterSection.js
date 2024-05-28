@@ -19,6 +19,8 @@ export default function ChapterSection({ chapterList, userEnrolledCourse }) {
         type: 'error',
         text1: 'İşlem Başarısız!',
         text2: 'Lütfen Önce Kursa Kaydolun! 👋',
+        text1Style: { fontSize: 18 },
+        text2Style: { fontSize: 16 }
       });
 
       return;

@@ -11,7 +11,6 @@ export const getCourseList = async () => {
         free
         price
         id
-        tag
         name
         publishedAt
         slug
@@ -33,6 +32,8 @@ export const getCourseList = async () => {
           url
         }
         counterEnroll
+        authorEmail
+        tags
       }
     }
   `;
@@ -41,34 +42,39 @@ export const getCourseList = async () => {
   return result;
 };
 
-export const enrollCourse = async (courseId, userEmail) => {
-  const mutationQuery =
-    gql`
-  mutation MyMutation {
-    createUserEnrollCourse(
-      data: {courseId: "` +
-    courseId +
-    `", 
-      userEmail: "` +
-    userEmail +
-    `",courseList: {connect: {id:"` +
-    courseId +
-    `"}}}
-      ) {
-      id
+
+export const enrollCourse = async (courseId, email) => {
+  const courseQuery = gql`
+    query MyQuery {
+      courseList(where: {id: "${courseId}"}) {
+        authorEmail
+      }
     }
-    publishManyUserEnrollCoursesConnection(to: PUBLISHED) {
-      edges {
-        node {
-          id
+  `;
+  const courseResult = await request(MASTER_URL, courseQuery);
+  const authorEmail = courseResult.courseList.authorEmail;
+
+  // Kullaniciyi kursa kaydet
+  const dateEnroll = new Date().toISOString();
+  const enrollQuery = gql`
+    mutation MyMutation {
+      createUserEnrollCourse(
+        data: {courseId:"${courseId}", userEmail:"${email}", authorEmail: "${authorEmail}", dateEnroll: "${dateEnroll}", courseList:{connect: {id : "${courseId}"}} }
+      )
+      {
+        id
+      }
+      publishManyUserEnrollCoursesConnection{
+        edges {
+          node {
+            id
+          }
         }
       }
     }
-  }
   `;
-
-  const result = await request(MASTER_URL, mutationQuery);
-  return result;
+  const enrollResult = await request(MASTER_URL, enrollQuery);
+  return enrollResult;
 };
 
 export const getUserEnrolledCourse = async (courseId, userEmail) => {
@@ -138,7 +144,7 @@ export const GetAllProgressCourse = async (userEmail) => {
         }
       }
       courseList {
-        tag
+        tags
         banner {
           url
         }
@@ -169,7 +175,8 @@ export const GetCategory = async() => {
   const query = gql`
     query MyQuery {
       courseLists {
-        tag
+        tags
+        counterEnroll
       }
     }
   `;
@@ -180,41 +187,47 @@ export const GetCategory = async() => {
 
 export const FilteredCategoryCourseList = async (category) => {
   const query = gql`
-  query CourseLists {
-    courseLists(where: {tag: `+category+`}) {
-      createdAt
-      description
-      free
-      price
-      id
-      tag
-      name
-      publishedAt
-      slug
-      totalChapters
-      updatedAt
-      chapter {
-        ... on Chapter {
-          id
-          name
-          shortDesc
-          video {
+    query CourseLists($category: String!) {
+      courseLists(where: { tags: $category }) {
+        createdAt
+        description
+        free
+        price
+        id
+        tags
+        name
+        publishedAt
+        slug
+        totalChapters
+        updatedAt
+        chapter {
+          ... on Chapter {
             id
-            url
+            name
+            shortDesc
+            video {
+              id
+              url
+            }
           }
         }
-      }
-      banner {
-        id
-        url
+        banner {
+          id
+          url
+        }
+        counterEnroll
       }
     }
+  `;
+  const variables = { category }; 
+  try {
+    const result = await request(MASTER_URL, query, variables); 
+    return result;
+  } catch (error) {
+    console.error("FilteredCategoryCourseList hatası:", error);
+    throw error;
   }
-  `
-  const result = await request(MASTER_URL, query);
-  return result;
-
-}
+};
 
 export const createCourse = async ({
   name,
@@ -230,7 +243,7 @@ export const createCourse = async ({
   videoUri,
 }) => {
   const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-  const mutationQuery = gql`
+  let mutationQuery = `
     mutation MyMutation {
       createCourseList(
         data: {
@@ -239,26 +252,44 @@ export const createCourse = async ({
           price: ${price}
           free: ${free}
           authorEmail: "${authorEmail}"
-          tag: ${selectedCategory}
+          tags: "${selectedCategory}"
           slug: "${slug}"
-          banner: { connect: { id: "${coverPhoto}" } }
-          chapter: {create: {Chapter: {
-            name: "${chapterName}", 
-            chapterNumber: ${chapterNum}, 
-            shortDesc: "${chapterDesc}",
-            video: {connect: {id: "${videoUri}" }}
-          }
-          }
-        }
+          totalChapters: 1,      
+  `;
 
+  if (coverPhoto) {
+    mutationQuery += `
+          banner: { connect: { id: "${coverPhoto}" } }
+    `;
+  }
+
+  mutationQuery += `
+          chapter: { create: { Chapter: {
+            name: "${chapterName}"
+            chapterNumber: ${chapterNum}
+            shortDesc: "${chapterDesc}"
+  `;
+
+  if (videoUri) {
+    mutationQuery += `
+            video: { connect: { id: "${videoUri}" } }
+    `;
+  }
+
+  mutationQuery += `
+          } } }
+  `;
+
+  mutationQuery += `
         }
       ) {
         id
+        totalChapters
       }
     }
   `;
 
-  const result = await request(MASTER_URL, mutationQuery);
+  const result = await request(MASTER_URL, gql`${mutationQuery}`);
   return result;
 };
 
@@ -400,7 +431,7 @@ export const completedChapterInfo = async (courseId,userEmail) => {
 };
 
 
-export const updateCourse = async ({ courseId, name, description, price, selectedCategory }) => {
+export const updateCourse = async ({ courseId, name, description, price, tags }) => {
   const slug = name.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
   
   const free = price > 0 ? false : true;
@@ -413,7 +444,7 @@ export const updateCourse = async ({ courseId, name, description, price, selecte
           description: "${description}"
           price: ${price}
           free: ${free}
-          tag: ${selectedCategory}
+          tags: "${tags}"
           slug: "${slug}"
         }
       ) {
@@ -433,7 +464,7 @@ export const idToCourse = async (courseId) => {
       totalChapters
       free
       price
-      tag   
+      tags   
     }
   }
   
@@ -615,4 +646,79 @@ export const deleteChapter = async ({courseId,chapterId}) => {
 
   const publishResult = await request(MASTER_URL, handleDeleteChapter);
   return publishResult;
+};
+
+export const creategisterCounter = async ({ authorEmail }) => {
+  const handleCreateRegisterCounter = gql`
+  mutation MyMutation {
+    createUserInfo(
+      data: { email: "${authorEmail}" }
+    ) {
+      id
+    }
+  }
+  `;
+
+  const handlePublishUserInfo = gql`
+  mutation PublishUserInfo {
+    publishUserInfo(where: { email: "${authorEmail}" }) {
+      id
+      completedChapterCounter
+    }
+  }
+  `;
+
+  try {
+    const createResult = await request(MASTER_URL, handleCreateRegisterCounter);
+    const publishResult = await request(MASTER_URL, handlePublishUserInfo);
+    
+    return { createResult, publishResult };
+  } catch (error) {
+    console.error("GraphQL mutation error:", error);
+    throw error;
+  }
+};
+
+
+export const updateRegisterCounter = async ({ authorEmail, completedChapterCounter }) => {
+  const handleUpdateChapter = gql`
+  mutation MyMutation {
+    updateUserInfo(data: { completedChapterCounter: ${completedChapterCounter} }, where: { email: "${authorEmail}" }) {
+      id
+      completedChapterCounter
+    }
+  }
+  `;
+
+  const handlePublishUserInfo = gql`
+  mutation PublishUserInfo {
+    publishUserInfo(where: { email: "${authorEmail}" }) {
+      id
+      completedChapterCounter
+    }
+  }
+  `;
+
+  try {
+    const updateResult = await request(MASTER_URL, handleUpdateChapter);
+    const publishResult = await request(MASTER_URL, handlePublishUserInfo);
+
+    return { updateResult, publishResult };
+  } catch (error) {
+    console.error("GraphQL mutation error:", error);
+    throw error;
+  }
+};
+
+
+export const getUserInfoCounter = async (authorEmail) => {
+  const query = gql`
+  query MyQuery {
+    userInfo(where: { email: "${authorEmail}" }) {
+      completedChapterCounter
+    }
+  }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
 };

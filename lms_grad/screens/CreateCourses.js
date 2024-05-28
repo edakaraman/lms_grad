@@ -45,37 +45,39 @@ const CreateCourses = ({ navigation }) => {
   const HYGRAPH_URL =
     "https://api-eu-west-2.hygraph.com/v2/clskpqlt63wpg01uplm4n0t71/master";
 
-  useEffect(() => {
-    GetCategory()
-      .then((resp) => {
-        if (resp && resp.courseLists) {
-          const filteredCategories = resp.courseLists.reduce(
-            (uniqueCategories, newCategory) => {
-              if (
-                !uniqueCategories.some(
-                  (existingCategory) =>
-                    existingCategory.tag === newCategory.tag[0]
-                )
-              ) {
-                uniqueCategories.push({ tag: newCategory.tag[0] });
-              }
-              return uniqueCategories;
-            },
-            []
-          );
-          setCategories(filteredCategories);
-        } else {
-          console.error("Geçersiz kategori yanıtı:", resp);
-        }
-      })
-      .catch((error) => {
-        console.error("Kategori alınırken bir hata oluştu:", error);
-      });
-  }, []);
+    useEffect(() => {
+      GetCategory()
+        .then((resp) => {
+          if (resp && resp.courseLists) {
+            const filteredCategories = resp.courseLists.reduce(
+              (uniqueCategories, newCategory) => {
+                if (newCategory.tags && newCategory.tags.trim() !== "") {
+                  if (
+                    !uniqueCategories.some(
+                      (existingCategory) =>
+                        existingCategory.tags === newCategory.tags
+                    )
+                  ) {
+                    uniqueCategories.push({ tags: newCategory.tags });
+                  }
+                }
+                return uniqueCategories;
+              },
+              []
+            );
+            setCategories(filteredCategories);
+          } else {
+            console.error("Geçersiz kategori yanıtı:", resp);
+          }
+        })
+        .catch((error) => {
+          console.error("Kategori alınırken bir hata oluştu:", error);
+        });
+    }, []);
 
   const handleSubmit = async () => {
     try {
-      let coverPhotoId = null;
+      let coverPhotoId = "";
       if (coverPhoto) {
         const form = new FormData();
         form.append("fileUpload", {
@@ -104,7 +106,7 @@ const CreateCourses = ({ navigation }) => {
         console.log("Asset yayınlandı:", publishAssetResult);
       }
 
-      let coverVideoId = null;
+      let coverVideoId = "";
       if (videoUri) {
         const form = new FormData();
         form.append("fileUpload", {
@@ -145,7 +147,7 @@ const CreateCourses = ({ navigation }) => {
         chapterDesc,
         chapterNum: parseFloat(chapterNum),
         videoUri: coverVideoId,
-      };
+     };
 
       const result = await createCourse(courseData);
       Alert.alert("Kurs Ekleme Başarılı!", "Kurs Eklendi!");
@@ -231,15 +233,15 @@ const CreateCourses = ({ navigation }) => {
           label="Kurs Ücreti"
           onChangeText={(value) => setPrice(parseFloat(value))}
         />
-        <Text className="ml-3 text-lg"> Kurs Kategorisi </Text>
+        <Text className="ml-3 mb-3 text-lg"> Kurs Kategorisi </Text>
         <Dropdown
           style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
           selectedTextStyle={styles.selectedTextStyle}
           inputSearchStyle={styles.inputSearchStyle}
           iconStyle={styles.iconStyle}
           data={categories.map((category) => ({
-            label: category.tag,
-            value: category.tag,
+            label: category.tags,
+            value: category.tags,
           }))}
           search
           searchPlaceholder="Ara..."
@@ -260,7 +262,8 @@ const CreateCourses = ({ navigation }) => {
             />
           )}
         />
-        <Input label="Kurs kategorisi" value={selectedCategory} />
+        <Input onChangeText={setSelectedCategory} value={ selectedCategory} />
+        {/* <Input label="Kurs kategorisi" value={selectedCategory} /> */}
         <View>
           <Text style={styles.header}> Kurs Bölümleri Ekle </Text>
           <Input
@@ -306,7 +309,6 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     width: "90%",
-    marginBottom: 16,
     marginLeft: 17,
     backgroundColor: "#FFFFFF",
     padding: 7,

@@ -22,7 +22,7 @@ const DropdownComponent = ({ categories, handleCategoryPress,courseList,setCours
     }
     setCourseList(filteredList);
   };
-  
+
 
   return (
     <View style={styles.container}>
@@ -32,7 +32,10 @@ const DropdownComponent = ({ categories, handleCategoryPress,courseList,setCours
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={categories.map(category => ({ label: category.tag, value: category.tag }))} // Kategorileri drop-down menüsüne uygun formata dönüştür
+        data={categories.map(category => ({
+          label: category.tag + (category.isPopular ? ' ⭐' : ''), // Kategori adının yanına yıldız ekleyerek popülerliği işaretleniyor
+          value: category.tag
+        }))}
         search
         maxHeight={300}
         labelField="label"

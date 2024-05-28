@@ -20,8 +20,6 @@ export default function ChapterContentScreen() {
    // console.log("RecordId",param.userCourseRecordId);
   },[param])
 
-  console.log("sedw",param);
-
   const onChapterFinish = () =>{
      MarkChapterCompleted(param.chapterId,param.userCourseRecordId,true).then(resp => {
       if(resp){
@@ -29,6 +27,8 @@ export default function ChapterContentScreen() {
           type: 'success',
           text1: 'İşlem Başarılı!',
           text2: 'Tebrikler bölümü tamamladınız! 👋',
+          text1Style: { fontSize: 18 },
+          text2Style: { fontSize: 16 }
         });
         setIsChapterComplete(true);
         //navigation.goBack();

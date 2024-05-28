@@ -39,6 +39,8 @@ export default function CourseDetailScreen() {
         type: 'success',
         text1: 'İşlem Başarılı!',
         text2: 'Kursa Kaydoldunuz! 👋',
+        text1Style: { fontSize: 18 },
+        text2Style: { fontSize: 16 }
       });
 
       GetCounter(params.course.id).then(resp => {
@@ -52,8 +54,8 @@ export default function CourseDetailScreen() {
     })
   }
   
-  const courseName = params.course.name;
-  const coursePrice = params.course.price;
+  const courseName = params.course?.name;
+  const coursePrice = params.course?.price;
 
   const stripeEnrollCourse = async () => {
     try {

@@ -12,7 +12,7 @@ export default function CourseProgress() {
 
   useEffect(() => {
     user && GetAllProgressCourseList();
-  }, [user,progressCourseList]);
+  }, [user,progressCourseList,progressCourseList.tags]);
 
   const GetAllProgressCourseList = () => {
     GetAllProgressCourse(user.primaryEmailAddress.emailAddress).then((resp) => {

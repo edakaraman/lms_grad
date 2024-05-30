@@ -16,7 +16,7 @@ const CourseList = ({ searchText }) => {
   useEffect(() => {
     getCourses();
     getCategory();
-  }, [searchText,courseList]);
+  }, [searchText]);
 
   const getCourses = () => {
     getCourseList()

@@ -45,38 +45,59 @@ const CreateCourses = ({ navigation }) => {
   const HYGRAPH_URL =
     "https://api-eu-west-2.hygraph.com/v2/clskpqlt63wpg01uplm4n0t71/master";
 
-    useEffect(() => {
-      GetCategory()
-        .then((resp) => {
-          if (resp && resp.courseLists) {
-            const filteredCategories = resp.courseLists.reduce(
-              (uniqueCategories, newCategory) => {
-                if (newCategory.tags && newCategory.tags.trim() !== "") {
-                  if (
-                    !uniqueCategories.some(
-                      (existingCategory) =>
-                        existingCategory.tags === newCategory.tags
-                    )
-                  ) {
-                    uniqueCategories.push({ tags: newCategory.tags });
-                  }
+  useEffect(() => {
+    GetCategory()
+      .then((resp) => {
+        if (resp && resp.courseLists) {
+          const filteredCategories = resp.courseLists.reduce(
+            (uniqueCategories, newCategory) => {
+              if (newCategory.tags && newCategory.tags.trim() !== "") {
+                if (
+                  !uniqueCategories.some(
+                    (existingCategory) =>
+                      existingCategory.tags === newCategory.tags
+                  )
+                ) {
+                  uniqueCategories.push({ tags: newCategory.tags });
                 }
-                return uniqueCategories;
-              },
-              []
-            );
-            setCategories(filteredCategories);
-          } else {
-            console.error("Geçersiz kategori yanıtı:", resp);
-          }
-        })
-        .catch((error) => {
-          console.error("Kategori alınırken bir hata oluştu:", error);
-        });
-    }, []);
+              }
+              return uniqueCategories;
+            },
+            []
+          );
+          setCategories(filteredCategories);
+        } else {
+          console.error("Geçersiz kategori yanıtı:", resp);
+        }
+      })
+      .catch((error) => {
+        console.error("Kategori alınırken bir hata oluştu:", error);
+      });
+  }, []);
 
   const handleSubmit = async () => {
     try {
+      if (
+        !name ||
+        !description ||
+        !selectedCategory ||
+        !chapterName ||
+        !chapterDesc ||
+        !chapterNum ||
+        !coverPhoto ||
+        !videoUri ||
+        price === "" ||
+        free === null
+      ) {
+        Alert.alert("Hata", "Lütfen tüm alanları doldurun.");
+        return;
+      }
+
+      if (parseFloat(price) < 75) {
+        Alert.alert("Hata", "Kurs ücreti 75TL ve üzeri olmalı.");
+        return;
+      }
+
       let coverPhotoId = "";
       if (coverPhoto) {
         const form = new FormData();
@@ -147,7 +168,7 @@ const CreateCourses = ({ navigation }) => {
         chapterDesc,
         chapterNum: parseFloat(chapterNum),
         videoUri: coverVideoId,
-     };
+      };
 
       const result = await createCourse(courseData);
       Alert.alert("Kurs Ekleme Başarılı!", "Kurs Eklendi!");

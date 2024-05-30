@@ -11,6 +11,7 @@ import ProfileEditScreen from '../screens/ProfileEditScreen';
 import MyCourses from '../screens/MyCourses';
 import StatisticsScreen from '../screens/StatisticsScreen';
 import CreateCourses from '../screens/CreateCourses';
+import LeadershipScreen from '../screens/LeadersipScreen';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +43,7 @@ export default function AppNavigation() {
         <Stack.Screen name="ProfileEdit" component={ProfileEditScreen} options={{headerTitle:""}} />
         <Stack.Screen name='Istatistic' component={StatisticsScreen} options={{headerTitle:""}} />
         <Stack.Screen name='CreateCourses' component={CreateCourses} options={{headerTitle:" "}} />
+        <Stack.Screen name="Leaderboard" component={LeadershipScreen} options={{headerTitle:" "}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

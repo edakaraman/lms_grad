@@ -31,6 +31,11 @@ const AddChapter = ({ id }) => {
 
   const handleSubmit = async () => {
     try {
+      if (!chapterName || !chapterDesc || !chapterNum || !videoUri) {
+        Alert.alert("Hata", "Lütfen tüm alanları doldurun.");
+        return;
+      }
+
       let coverVideoId = null;
       if (videoUri) {
         const form = new FormData();

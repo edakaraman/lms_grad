@@ -16,6 +16,7 @@ import {
 import Toast from 'react-native-toast-message';
 import { StripeProvider } from "@stripe/stripe-react-native";
 import CreateCourses from "./screens/CreateCourses";
+import LeadershipScreen from "./screens/LeadersipScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -55,6 +56,15 @@ export default function App() {
                         color={color}
                         size={size}
                       />
+                    ),
+                  }}
+                />
+                   <Tab.Screen
+                  name="Liderlik"
+                  component={LeadershipScreen}
+                  options={{
+                    tabBarIcon: ({ color, size }) => (
+                      <FontAwesome name="trophy"  color={color} size={size} />
                     ),
                   }}
                 />

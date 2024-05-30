@@ -722,3 +722,17 @@ export const getUserInfoCounter = async (authorEmail) => {
   const result = await request(MASTER_URL, query);
   return result;
 };
+
+
+export const getLeaderTable = async () => {
+  const query = gql`
+  query MyQuery {
+    userInfos(orderBy: completedChapterCounter_DESC) {
+      completedChapterCounter
+      email
+    }
+  }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
+};

@@ -14,7 +14,7 @@ app.post("/pay", async (req, res) => {
     const {courseName,coursePrice } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(coursePrice * 100),
-      currency: "INR",
+      currency: "TRY", 
       payment_method_types: ["card"],
       metadata: { courseName },
     });
@@ -24,8 +24,12 @@ app.post("/pay", async (req, res) => {
   } 
   catch (err) 
   {
-    console.error(err);
-    res.status(500).json({ message: "İç Sunucu Hatası!" });
+    if (err.code === 'amount_too_small') {
+      res.status(400).json({ message: "Ödeme tutarı çok düşük. Lütfen daha yüksek bir tutar girin." });
+    } else {
+      console.error(err);
+      res.status(500).json({ message: "İç Sunucu Hatası!" });
+    }
   }
 });
-app.listen(PORT, () => console.log(`Serverın çalıştığı port ${PORT}`));
+app.listen(PORT, () => console.log(`Server ${PORT} portunda çalışıyor`));

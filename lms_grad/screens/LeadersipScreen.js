@@ -10,7 +10,7 @@ const LeadershipScreen = () => {
     getLeaderTable().then((data) => {
        setLeaderboardData(data.userInfos);
     })
-  },[]);
+  },[leaderboardData]);
 
   return (
     <View style={styles.container}>

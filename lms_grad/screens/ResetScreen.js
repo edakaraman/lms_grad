@@ -17,7 +17,6 @@ const ResetScreen = () => {
   const [successfulCreation, setSuccessfulCreation] = useState(false);
   const { signIn, setActive } = useSignIn();
 
-  // Request a passowrd reset code by email
   const onRequestReset = async () => {
     try {
       await signIn.create({
@@ -30,7 +29,6 @@ const ResetScreen = () => {
     }
   };
 
-  // Reset the password with the code and the new password
   const onReset = async () => {
     try {
       const result = await signIn.attemptFirstFactor({
@@ -41,7 +39,6 @@ const ResetScreen = () => {
       console.log(result);
       alert("Şifreniz Güncellendi!");
 
-      // Set the user session active, which will log in the user automatically
       await setActive({ session: result.createdSessionId });
     } catch (err) {
       alert(err.message);

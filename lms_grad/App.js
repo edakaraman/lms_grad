@@ -68,28 +68,6 @@ export default function App() {
                     ),
                   }}
                 />
-                        {/* <Tab.Screen
-                      name="İstatistik"
-                      component={StatisticsScreen}
-                      options={{
-                        tabBarIcon: ({ color, size }) => (
-                          <FontAwesome
-                            name="bar-chart"
-                            color={color}
-                            size={size}
-                          />
-                        ),
-                      }}
-                    />   
-                    <Tab.Screen
-                      name="Kurs Ekle"
-                      component={CreateCourses}
-                      options={{
-                        tabBarIcon: ({ color, size }) => (
-                          <FontAwesome name="book" color={color} size={size} />
-                        ),
-                      }}
-                    /> */}
                 {userRole === "öğretmen" && (
                   <>
                     <Tab.Screen

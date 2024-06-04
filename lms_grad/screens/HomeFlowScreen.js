@@ -34,7 +34,6 @@ const HomeFlowScreen = () => {
 
   const handleSignOut = async () => {
     try {
-      // Clerk tarafından sağlanan signOut fonksiyonu kullanılıyor
       await window.Clerk.signOut();
       navigation.navigate("Home");
     } catch (error) {
@@ -73,8 +72,6 @@ const HomeFlowScreen = () => {
           style={{ width: width, height: 130,borderRadius:5,marginLeft:3 }}
         />
         <ScrollView>
-          {/* <CourseProgress /> */}
-          {/* <DisplayCategory/> */}
           <CourseList searchText={searchText} />
         </ScrollView>
       </ScrollView>

@@ -93,7 +93,7 @@ const CreateCourses = ({ navigation }) => {
         return;
       }
 
-      if (parseFloat(price) < 75) {
+      if (free === false && parseFloat(price) < 75) {
         Alert.alert("Hata", "Kurs ücreti 75TL ve üzeri olmalı.");
         return;
       }
@@ -284,7 +284,6 @@ const CreateCourses = ({ navigation }) => {
           )}
         />
         <Input onChangeText={setSelectedCategory} value={ selectedCategory} />
-        {/* <Input label="Kurs kategorisi" value={selectedCategory} /> */}
         <View>
           <Text style={styles.header}> Kurs Bölümleri Ekle </Text>
           <Input

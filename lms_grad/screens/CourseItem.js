@@ -1,23 +1,10 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import CourseProgressBar from "./CourseProgressBar";
-import { useUser } from "@clerk/clerk-expo";
-import { getLeaderTable } from "../services";
 
 export default function CourseItem({ item,completedChapter,progress,isPopular }) {
-  const { user } = useUser();
   
-  useEffect(() => {
-    getLeaderTable().then((data) => {
-      const firstUserEmail = data.userInfos[0]?.email;
-
-      if (user.primaryEmailAddress.emailAddress === firstUserEmail) {
-        item.price *= 0.5; 
-      }
-    });
-  }, [item]);
-
   return (
     <View className="p-2 bg-white mr-3 rounded-2xl">
       <Image
@@ -59,7 +46,6 @@ export default function CourseItem({ item,completedChapter,progress,isPopular })
           completedChapter={completedChapter}
         />
         : null }
-      <Text className="text-base">{item.price} TL</Text>
     </View>
   );
 }

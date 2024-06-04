@@ -4,7 +4,6 @@ import {
   Alert,
   StyleSheet,
   Image,
-  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -105,7 +104,6 @@ const AddChapter = ({ id }) => {
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setVideoUri(result.assets[0].uri);
-      //onChange(result.assets[0].uri);
     }
   };
 

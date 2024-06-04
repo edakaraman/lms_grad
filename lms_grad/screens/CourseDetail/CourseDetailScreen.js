@@ -18,6 +18,7 @@ export default function CourseDetailScreen() {
   const [coursePrice, setCoursePrice] = useState(params.course?.price);
 
   useEffect(() => {
+    console.log("userrr")
     if (user) {
       getLeaderTable().then((data) => {
         const firstUserEmail = data.userInfos[0]?.email;
@@ -71,7 +72,7 @@ export default function CourseDetailScreen() {
 
   const handleStripeEnrollCourse = async () => {
     try {
-      const response = await fetch("http://192.168.1.45:3000/pay", {
+      const response = await fetch("http://192.168.1.47:3000/pay", {
         method: "POST",
         body: JSON.stringify({ courseName: params.course?.name, coursePrice }),
         headers: { "Content-Type": "application/json" },

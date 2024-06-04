@@ -23,8 +23,6 @@ export default function SignInScreen() {
         identifier: emailAddress,
         password,
       });
-      // This is an important step,
-      // This indicates the user is signed in
       await setActive({ session: completeSignIn.createdSessionId });
     } catch (err) {
       Alert.alert("Giriş Bilgileriniz Hatalı!", "Lütfen giriş bilgilerinizi kontrol edin.");
@@ -42,7 +40,7 @@ export default function SignInScreen() {
   };
   const onUserRole = (role) => {
     setUserRole(role);
-    setActiveIndex(role); // activeIndex değeri güncelleniyor
+    setActiveIndex(role); 
   };
 
   return (

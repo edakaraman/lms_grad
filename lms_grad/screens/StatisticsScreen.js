@@ -27,33 +27,6 @@ export default function StatisticsScreen() {
   const courseNamelabels = courseList.map((course) => course.name);
   const courseCounterdata = courseList.map((course) => course.counterEnroll);
   const coursePriceData = courseList.map((course) => course.price);
-  const courseFreeData = courseList.map((course) => course.free);
-  //console.log(courseFreeData); //[true,true]
-
-  const totalCourses = courseList.length;
-  const totalPaidCourses = courseList.filter((course) => course.free).length;
-  const totalFreeCourses = totalCourses - totalPaidCourses;
-
-  const percentagePaidCourses = (totalPaidCourses / totalCourses) * 100;
-  const percentageFreeCourses = (totalFreeCourses / totalCourses) * 100;
-
-  const data2 = {
-    labels: ["Ücretli", "Ücretsiz"],
-    data: [percentagePaidCourses / 100, percentageFreeCourses / 100],
-  };
-
-  const totalEnrollments = courseCounterdata.reduce(
-    (total, count) => total + count,
-    0
-  );
-  const coursePercentages = courseCounterdata.map(
-    (count) => count / totalEnrollments
-  );
-
-  const data = {
-    labels: courseNamelabels,
-    data: coursePercentages,
-  };
 
   const totalIncome = coursePriceData.reduce((total, price, index) => {
     return total + price * courseCounterdata[index];

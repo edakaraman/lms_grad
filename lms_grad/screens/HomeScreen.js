@@ -2,8 +2,6 @@ import {View, Text,TouchableOpacity,Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
-/** kaldırılacak */
-import { removeItem } from '../utils/asyncStorage';
 import styles from "../styles/HomeScreen.style"
 
 
@@ -16,12 +14,6 @@ const HomeScreen = () => {
   const handleSignUp = () => {
     navigation.navigate("SignUp");
   }
-
-  // //kaldırılacak.
-  // const handleReset = async ()=>{
-  //   await removeItem('onboarded');
-  //   navigation.push('Onboarding');
-  // }
   
   return (
     <SafeAreaView className="flex-1 bg-gray-200">
@@ -46,9 +38,6 @@ const HomeScreen = () => {
           <Text style={styles.routeText}>Giriş Yap </Text>
         </TouchableOpacity>
       </View>
-      {/* <TouchableOpacity onPress={handleReset}>
-        <Text>Reset</Text>
-      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };

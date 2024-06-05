@@ -3,7 +3,7 @@ import React from "react";
 
 export default function CourseProgressBar({ totalChapter, completedChapter }) {
   const percentageCompleted = (completedChapter / totalChapter) * 100;
-  const width = percentageCompleted > 100 ? 100 : percentageCompleted; // Bar'ın tamamının mavi gözükmesini sağlamak için
+  const width = percentageCompleted > 100 ? 100 : percentageCompleted; 
 
   return (
     <>

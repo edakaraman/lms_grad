@@ -1,5 +1,3 @@
-// SearchCourses.js
-
 import React, { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { TextInput, View } from "react-native";

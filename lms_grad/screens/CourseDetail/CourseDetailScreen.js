@@ -18,7 +18,6 @@ export default function CourseDetailScreen() {
   const [coursePrice, setCoursePrice] = useState(params.course?.price);
 
   useEffect(() => {
-    console.log("userrr")
     if (user) {
       getLeaderTable().then((data) => {
         const firstUserEmail = data.userInfos[0]?.email;

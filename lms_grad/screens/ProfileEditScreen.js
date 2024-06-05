@@ -24,7 +24,6 @@ const ProfileEditScreen = () => {
     setEmail(user.emailAddresses[0].emailAddress);
   }, [user]);
   
-  // Update Clerk user data
   const onSaveUser = async () => {
     try {
       await user?.update({

@@ -19,7 +19,6 @@ export default function DetailSection({ course ,enrollCourse,userEnrolledCourse,
           icon={"book-outline"}
           value={course.chapter?.length + " Bölüm"}
         />
-        {/* <OptionItem icon={"person-circle-outline"} value={course.author} /> */}
         <OptionItem
           icon={"logo-euro"}
           value={course.free ? "Ücretsiz" : "Ücretli"}

@@ -28,14 +28,12 @@ export default function SignUpScreen() {
     navigation.navigate("SignIn");
   };
 
-  // start the sign up process.
   const onSignUpPress = async () => {
     if (!isLoaded) {
       return;
     }
 
     try {
-      // Şifreleri karşılaştır
       if (password !== confirmPassword) {
         console.error("Şifreler eşleşmiyor.");
         return;
@@ -47,16 +45,13 @@ export default function SignUpScreen() {
         password,
       });
 
-      // send the email.
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      // change the UI to our pending section.
       setPendingVerification(true);
     } catch (err) {
       console.error(JSON.stringify(err, null, 2));
     }
   };
 
-  // This verifies the user using email code that is delivered.
   const onPressVerify = async () => {
     if (!isLoaded) {
       return;
@@ -77,8 +72,6 @@ export default function SignUpScreen() {
     setUserRole(role);
     setActiveIndex(role); 
   };
-
-  //console.log(userRole);
 
   return (
     <View className="flex-1 bg-white">

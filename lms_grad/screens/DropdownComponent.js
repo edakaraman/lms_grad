@@ -33,7 +33,7 @@ const DropdownComponent = ({ categories, handleCategoryPress,courseList,setCours
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={categories.map(category => ({
-          label: category.tag + (category.isPopular ? ' ⭐' : ''), // Kategori adının yanına yıldız ekleyerek popülerliği işaretleniyor
+          label: category.tag + (category.isPopular ? ' ⭐' : ''), 
           value: category.tag
         }))}
         search

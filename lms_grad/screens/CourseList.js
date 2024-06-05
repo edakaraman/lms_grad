@@ -26,7 +26,6 @@ const CourseList = ({ searchText }) => {
           setCourseList(sortedCourseList);
   
           const mostPopularCourseName = sortedCourseList.length > 0 ? sortedCourseList[0].name : null;
-          //console.log("En popüler kursun ismi:", mostPopularCourseName);
           setMostPopularCourse(mostPopularCourseName);
         }
       })

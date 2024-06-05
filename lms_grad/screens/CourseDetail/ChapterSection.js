@@ -10,10 +10,8 @@ export default function ChapterSection({ chapterList, userEnrolledCourse }) {
 
   const {isChapterComplete,setIsChapterComplete} = useContext(CompleteChapterContext);
   const navigation = useNavigation();
-  //console.log("bölümler hakkında", userEnrolledCourse[0]?.completedChapter.map(chapter => chapter.chapterId));
 
   const OnChapterPress = (chapter) => {
-    //console.log("Tıklanan Bölüm:", chapter); 
     if (userEnrolledCourse.length == 0) {
       Toast.show({
         type: 'error',

@@ -50,9 +50,9 @@ const DropdownCategory = () => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          setCategoryValue(item.value); // Seçilen kategori değerini set et
+          setCategoryValue(item.value);
           setIsFocus(false);
-          onSelectCategory(item.value.tag); // Kategori değerini string formatına dönüştürerek setSelectedCategory fonksiyonunu çağır
+          onSelectCategory(item.value.tag);
         }}
         renderLeftIcon={() => (
           <AntDesign
@@ -63,7 +63,7 @@ const DropdownCategory = () => {
           />
         )}
       />
-      <Button title={"Kategori Ekle"} onPress={handleAddCategory} /> {/* Buton eklendi */}
+      <Button title={"Kategori Ekle"} onPress={handleAddCategory} />
     </View>
   );
 };

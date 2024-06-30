@@ -1,5 +1,5 @@
 <h2> LMS Graduation Project </h2>
-<b> This is a software engineering graduation project. </b>
+<p> This is a software engineering graduation project. </p>
 
 ### The subject of the project 
 #### Student Login:

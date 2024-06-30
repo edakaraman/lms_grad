@@ -71,7 +71,7 @@ export default function CourseDetailScreen() {
 
   const handleStripeEnrollCourse = async () => {
     try {
-      const response = await fetch("http://192.168.1.47:3000/pay", {
+      const response = await fetch(IP_or_localhost:3000/pay", {
         method: "POST",
         body: JSON.stringify({ courseName: params.course?.name, coursePrice }),
         headers: { "Content-Type": "application/json" },

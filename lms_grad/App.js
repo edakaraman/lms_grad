@@ -24,13 +24,13 @@ export default function App() {
   
   const [isChapterComplete,setIsChapterComplete] = useState(false);
   const [userRole, setUserRole] = useState("");
-  const publishableKey = "pk_test_51P4SvbDGuEEhG3oSGvo4AJIvABZhmsci064QamNTqpsfnrBe8Mc9uncFvCc6hXdeOXEB8XR2ISssDpeuDv1LpgEm00x9GWQLjN"
+  const publishableKey = "YOUR_STRIPE_PUBLISHABLE_KEY"
   return (
      <StripeProvider
      publishableKey={publishableKey}
      >
     <ClerkProvider
-      publishableKey={"pk_test_YXJyaXZpbmctcmFjZXItOTIuY2xlcmsuYWNjb3VudHMuZGV2JA"}
+      publishableKey={"YOUR_CLERK_PUBLISHABLE_KEY"}
     >
       <UserRoleContext.Provider value={{ userRole, setUserRole }}>
         <CompleteChapterContext.Provider value={{isChapterComplete,setIsChapterComplete}}>
